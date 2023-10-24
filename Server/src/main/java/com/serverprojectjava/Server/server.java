@@ -65,17 +65,20 @@ public class server {
      * @throws IOException
      */
     private void runServer() throws IOException{
-        ServerSocket serverSocket = new ServerSocket(this.Port);
-        System.out.println("Server is running...");
-        System.out.println("Proccess: 0%");
-        System.out.println("Proccess: 10%");
-        System.out.println("Proccess: 50%");
-        System.out.println("Proccess: 75%");
-        System.out.println("Proccess: 95%");
-        System.out.println("Proccess: 100%");
-        System.out.println("DONE");
-        while(true){
-            Socket socket = serverSocket.accept();
+        try (ServerSocket serverSocket = new ServerSocket(this.Port)) {
+            System.out.println("Server is running...");
+            System.out.println("Proccess: 0%");
+            System.out.println("Proccess: 10%");
+            System.out.println("Proccess: 50%");
+            System.out.println("Proccess: 75%");
+            System.out.println("Proccess: 95%");
+            System.out.println("Proccess: 100%");
+            System.out.println("DONE");
+            while(true){
+                try (Socket socket = serverSocket.accept()) {
+                    
+                }
+            }
         }
     }
 
