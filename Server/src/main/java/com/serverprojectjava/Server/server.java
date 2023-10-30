@@ -3,18 +3,24 @@ package com.serverprojectjava.Server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.serverprojectjava.Server.Module.ClientConnect;
 import com.serverprojectjava.Throw.ExceptionServer;
 
 public class server {
 
     private int Port;
+    private Map<InetAddress, ClientConnect> Clients = new HashMap<>();
 
     public void init(){
         LoadDataServer();
@@ -75,9 +81,28 @@ public class server {
             System.out.println("Proccess: 100%");
             System.out.println("DONE");
             while(true){
-                try (Socket socket = serverSocket.accept()) {
-                    
-                }
+                Socket socket = serverSocket.accept();
+                ClientConnect clientcn = new ClientConnect(socket);
+                this.Clients.put((InetAddress) socket.getInetAddress(), clientcn);
+
+                Thread clientThread = new Thread(() -> {
+                    try {
+                        // data handling client here
+
+                        // check status connecting
+                        if (socket.isClosed()) {
+                            System.out.println("Client disconnect: " + socket.getInetAddress());
+                            this.Clients.remove(socket.getInetAddress());
+                        }
+
+                        // event client disconnect
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+                clientThread.start();
             }
         }
     }
@@ -88,5 +113,14 @@ public class server {
     public int getPortServer(){
         return this.Port;
     }
-    
+
+
+    /*
+     * function to get count client is connecting to server
+     */
+    public int getCountClients(){
+        return Clients.size();
+    }
+
+
 }
